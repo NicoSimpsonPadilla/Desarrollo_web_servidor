@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datos</title>
+    <title>Datos_usuarios</title>
+    <?php require 'base_de_datos.php'; ?>
 </head>
 <body>
     <?php
@@ -11,23 +12,6 @@
         $salida = htmlspecialchars($entrada);
         $salida = trim($salida);
         return $salida;
-    }
-
-    function isValidDate($date) {
-        list($year, $month, $day) = explode('-', $date);
-        if ($year < date("Y")) {
-            return false;
-        } else {
-            if ($month > date("m")) {
-                return false;
-            } else {
-                if ($day > date("d")) {
-                    return false;
-                } else {
-                    return checkdate($month, $day, $year);
-                }
-            }
-        }
     }
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -41,7 +25,7 @@
         // Para que los espacios en blanco no cuenten, para cod interno
         $temp_apellidos = preg_replace("/[ ]{2,}/", ' ', $temp_apellidos);
 
-        $temp_nacimiento = depurar($_POST["nacimiento"]);
+        $temp_fecha_nacimiento = depurar($_POST["fecha_nacimiento"]);
     
         if(!strlen($temp_usuario) > 0) {
             $err_usuario = "El nombre de usuario es obligatorio";
@@ -82,13 +66,28 @@
             }
         }
 
-        if(!strlen($temp_nacimiento) > 0) {
-            $err_nacimiento = "El nacimiento es obligatoria";
+        if(strlen($temp_fecha_nacimiento) == 0) {
+            $err_fecha_nacimiento = "La fecha de nacimiento es obligatoria";
         } else {
-            if (!isValidDate($temp_nacimiento)) {
-                $err_nacimiento = "Debes de ser mayor de edad";
+            $fecha_actual = date("Y-m-d");
+            list($anyo_actual, $mes_actual, $dia_actual) = explode('-', $fecha_actual);
+            list($anyo, $mes, $dia) = explode('-', $temp_fecha_nacimiento);
+            if($anyo_actual - $anyo > 18) {
+                $fecha_nacimiento = $temp_fecha_nacimiento;
+            } else if($anyo_actual - $anyo < 18) {
+                $err_fecha_nacimiento = "No puedes ser menor de edad";
             } else {
-                $nacimiento = $temp_nacimiento;
+                if($mes_actual - $mes > 0) {
+                    $fecha_nacimiento = $temp_fecha_nacimiento;
+                } else if($mes_actual - $mes < 0) {
+                    $err_fecha_nacimiento = "No puedes ser menor de edad";
+                } else {
+                    if($dia_actual - $dia >= 0) {
+                        $fecha_nacimiento = $temp_fecha_nacimiento;
+                    }else{
+                        $err_fecha_nacimiento = "No puedes ser menor de edad";
+                    }
+                }
             }
         }
     }
@@ -110,8 +109,8 @@
             <?php if(isset($err_apellidos)) echo $err_apellidos ?>
             <br><br>
             <label>Fecha de nacimiento:</label>
-            <input type="date" name="nacimiento">
-            <?php if(isset($err_nacimiento)) echo $err_nacimiento ?>
+            <input type="date" name="fecha_nacimiento">
+            <?php if(isset($err_fecha_nacimiento)) echo $err_fecha_nacimiento ?>
             <br><br>
             <input type="submit" value="Registrarse">
         </fieldset>
@@ -120,11 +119,16 @@
     <br><br>
 
     <?php
-    if(isset($usuario) && isset($nombre) && isset($apellidos) && isset($nacimiento)) {
+    if(isset($usuario) && isset($nombre) && isset($apellidos) && isset($fecha_nacimiento)) {
         echo strlen($apellidos);
         echo "<br>";
-        echo "$nombre $apellidos nacio el $nacimiento 
+        echo "$nombre $apellidos nacio el $fecha_nacimiento 
         y su nombre de usuario es $usuario.";
+
+        $sql = "INSERT INTO usuarios (usuario, nombre, apellidos, fecha_nacimiento)
+            VALUES ('$usuario', '$nombre', '$apellidos', '$fecha_nacimiento')";
+
+        $conexion -> query($sql);
     }
     ?>
 </body>
