@@ -31,6 +31,8 @@
             $temp_edad_recomendada = "";
         }
 
+        $nombre_imagen = $_FILES
+
         // Validacion de id_pelicula
         if(!strlen($temp_id_pelicula) > 0) {
             $err_id_pelicula = "La pelicula debe de tener un id";
@@ -89,7 +91,7 @@
     <div class="container">
         <h1>Insertar pelicula</h1>
         <div class="col-9">
-            <form action="" method="post">
+            <form action="" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">ID: </label>
                     <input class="form-control" type="number" name="id_pelicula">
@@ -117,6 +119,10 @@
                         <option value="18">Mayores de 18 años</option>
                     </select>
                     <?php if(isset($err_edad_recomendada)) echo $err_edad_recomendada ?>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Imagen</label>
+                    <input class="form-control" type="file" name="imagen">
                 </div>
                 <button class="btn btn-primary" type="submit">Enviar</button>
             </form>
