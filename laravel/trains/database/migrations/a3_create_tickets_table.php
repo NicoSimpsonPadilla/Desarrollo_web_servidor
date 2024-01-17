@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
+            $table->timestamp('date');
             $table->float('price');
             $table->unsignedBigInteger('train_id');
             $table->unsignedBigInteger('ticket_type_id');
